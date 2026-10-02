@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { 
   saveReportLocally, 
   getReportLocally, 
@@ -44,7 +44,6 @@ describe('IndexedDB Offline Persistence Service', () => {
 
     const all = await getAllReportsLocally();
     expect(all.length).toBeGreaterThanOrEqual(2);
-    // Newest report should be first
     expect(new Date(all[0].reported_at).getTime()).toBeGreaterThanOrEqual(
       new Date(all[1].reported_at).getTime()
     );
@@ -87,7 +86,6 @@ describe('IndexedDB Offline Persistence Service', () => {
     };
     await saveReportLocally(localDraft);
 
-    // Incoming server report with same ID but different status
     await mergeServerReports([
       {
         id: localDraft.id,
@@ -101,7 +99,6 @@ describe('IndexedDB Offline Persistence Service', () => {
       }
     ]);
 
-    // Local report should NOT have been overwritten because it was PENDING
     const protectedDraft = await getReportLocally(localDraft.id);
     expect(protectedDraft?.sync_status).toBe('PENDING');
     expect(protectedDraft?.description).toBe('Unsynced local draft description');
